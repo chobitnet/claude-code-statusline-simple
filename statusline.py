@@ -13,6 +13,7 @@ drawn at sub-cell precision. The Powerline separator needs a Nerd Font, so it
 is not the default.
 
   Style   : CC_STATUSLINE_STYLE=powerline (default is minimal)
+  Reset   : CC_STATUSLINE_RESET="in " if your font has no ↻ (U+21BB)
   Compare : python3 ~/.claude/statusline.py --demo
   Debug   : touch ~/.claude/.statusline-debug and the raw JSON lands in
             ~/.claude/.statusline-input.json
@@ -51,6 +52,12 @@ FULL = "█"
 EMPTY = "·"
 
 PL_SEP = ""  # Powerline right arrow (needs a Nerd Font)
+
+# Marks the time until a limit resets. U+21BB is missing from most coding fonts
+# (1 of the 9 mainstream ones checked), so the terminal has to fall back to
+# another face for it. Set CC_STATUSLINE_RESET to anything you like -- "in " is
+# a safe ASCII choice, an empty string drops the marker.
+RESET_MARK = os.environ.get("CC_STATUSLINE_RESET", "↻")
 
 # Usage to colour stops. green = room, amber = watch it, red = nearly out
 HEAT_STOPS = ((0, (126, 196, 140)), (55, (223, 190, 100)),
@@ -124,7 +131,7 @@ def until(epoch):
 
 
 def short_model(name, model_id):
-    """"Opus 5 (1M context)" → "Opus 5 1M"。"""
+    """Shortens "Opus 5 (1M context)" to "Opus 5 1M"."""
     name = re.sub(r"\s*\((\d+M) context\)", r" \1", name or model_id or "?")
     if "1M" not in name and "[1m]" in (model_id or ""):
         name += " 1M"
@@ -154,7 +161,7 @@ def advisor_of(transcript_path):
 
 
 def pretty_advisor(model_id):
-    """"claude-opus-4-8" → "Opus 4.8"。"""
+    """Turns "claude-opus-4-8" into "Opus 4.8"."""
     low = model_id.lower()
     for key, label in (("fable", "Fable"), ("opus", "Opus"),
                        ("sonnet", "Sonnet"), ("haiku", "Haiku")):
@@ -263,7 +270,7 @@ def build(d):
             continue
         left = until(win.get("resets_at"))
         tail.append(seg(limit_label(key), f"{float(pct):.0f}%",
-                        f"↻{left}" if left else "",
+                        f"{RESET_MARK}{left}" if left else "",
                         accent=heat(float(pct)), pct=float(pct)))
     return head, tail
 

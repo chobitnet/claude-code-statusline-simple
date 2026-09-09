@@ -80,6 +80,28 @@ Set it in the `settings.json` command if you want it permanently:
 "command": "CC_STATUSLINE_STYLE=powerline python3 ~/.claude/statusline.py"
 ```
 
+## Fonts
+
+The minimal style draws from the block-element and box-drawing ranges, which is
+the part of Unicode that terminal fonts are expected to carry. The cmap of nine
+widely used coding fonts was checked (JetBrains Mono, Fira Code, Source Code
+Pro, IBM Plex Mono, Noto Sans Mono, Inconsolata, Ubuntu Sans Mono, Roboto Mono,
+Space Mono), along with what macOS ships:
+
+- `█` and `│` — 7 of the 9. The two without them, Roboto Mono and Space Mono,
+  are not terminal fonts.
+- `▏` and the other partial blocks — 6 of the 9 (Ubuntu Sans Mono also lacks
+  them). Only the fractional tip of a bar is affected.
+- `·` and `—` — all 9.
+- `↻`, the marker before the time until a reset — **1 of the 9** (IBM Plex Mono),
+  though Menlo has it. Your terminal falls back to another installed face, which
+  usually renders but may not match the rest of the line. Set
+  `CC_STATUSLINE_RESET="in "` for plain ASCII, or `CC_STATUSLINE_RESET=` to drop
+  the marker.
+- `⚡`, shown only in fast mode — an emoji, so it comes from the system emoji
+  font and is usually double width.
+- The Powerline separator — a Nerd Font glyph, as above.
+
 ## Debugging
 
 Claude Code passes the status line a JSON object on stdin
@@ -182,6 +204,25 @@ CC_STATUSLINE_STYLE=powerline python3 ~/.claude/statusline.py
 ```json
 "command": "CC_STATUSLINE_STYLE=powerline python3 ~/.claude/statusline.py"
 ```
+
+### フォント
+
+既定の minimal が使うのは Block Elements と Box Drawing の文字で、ターミナル向けのフォントが
+持っていることを期待される範囲です。広く使われるコーディングフォント9本(JetBrains Mono /
+Fira Code / Source Code Pro / IBM Plex Mono / Noto Sans Mono / Inconsolata / Ubuntu Sans Mono /
+Roboto Mono / Space Mono)と、macOS 同梱のフォントについて cmap を数えました。
+
+- `█` と `│` は9本中7本。持っていない Roboto Mono と Space Mono は、ターミナル用のフォントでは
+  ありません。
+- `▏` などの部分ブロックは9本中6本(Ubuntu Sans Mono も持っていません)。影響を受けるのは
+  バーの端の1文字だけです。
+- `·` と `—` は9本すべてにあります。
+- リセットまでの時間に付く `↻` は、**9本中1本**(IBM Plex Mono)しかありません。Menlo にはあります。
+  無い場合はターミナルが別のフォントで代替するので大抵は出ますが、行の他の文字と揃わないことが
+  あります。`CC_STATUSLINE_RESET="in "` で ASCII になり、`CC_STATUSLINE_RESET=` で印が消えます。
+- fast モードのときだけ出る `⚡` は絵文字なので、システムの絵文字フォントから来ます。
+  たいてい全角幅になります。
+- Powerline の区切りは上のとおり Nerd Font のグリフです。
 
 ### デバッグ
 
