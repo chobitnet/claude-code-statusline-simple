@@ -1,5 +1,7 @@
 # claude-code-statusline-simple
 
+[**日本語の説明はこのページの下にあります**](#日本語)
+
 A single-file status line for [Claude Code](https://claude.com/claude-code).
 No dependencies, no config file, no Nerd Font. One Python script, ~300 lines.
 
