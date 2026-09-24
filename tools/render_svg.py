@@ -70,7 +70,7 @@ def ansi_cells(line):
     return cells
 
 
-def sample(model, effort, advisor, ctx_pct, five_h, week, in_5h, in_wk):
+def sample(model, effort, ctx_pct, five_h, week, in_5h, in_wk):
     """in_5h / in_wk are seconds until the reset, passed relative so the times
     shown in the image stay the same on every run."""
     total = round(1_000_000 * ctx_pct / 100)
@@ -87,7 +87,6 @@ def sample(model, effort, advisor, ctx_pct, five_h, week, in_5h, in_wk):
             "five_hour": {"used_percentage": five_h, "resets_at": now + in_5h},
             "seven_day": {"used_percentage": week, "resets_at": now + in_wk},
         },
-        "_advisor": advisor,
     }
 
 
@@ -121,9 +120,6 @@ def render(rows, path, caption_color="#7d8799"):
 
 
 def line_of(sl, data):
-    """The advisor can only come from a transcript, so stub it out here."""
-    advisor = data.pop("_advisor", None)
-    sl.advisor_of = lambda _path: advisor
     buf = io.StringIO()
     with redirect_stdout(buf):
         sl.emit(data)
@@ -135,7 +131,7 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     opus = ("Opus 5", "claude-opus-5")
 
-    render([(line_of(sl, sample(opus, "medium", None, 8, 39, 42, 4 * 3600 + 21 * 60, 4 * 86400 + 4 * 3600)),
+    render([(line_of(sl, sample(opus, "medium", 8, 39, 42, 4 * 3600 + 21 * 60, 4 * 86400 + 4 * 3600)),
              None)],
            os.path.join(OUT_DIR, "statusline.svg"))
 
@@ -147,7 +143,7 @@ def main():
     ]
     rows = []
     for ctx, five, week, note in steps:
-        data = sample(opus, "xhigh", "claude-sonnet-5", ctx, five, week,
+        data = sample(opus, "xhigh", ctx, five, week,
                       2 * 3600 + 7 * 60, 2 * 86400 + 9 * 3600)
         rows.append((line_of(sl, data), note))
     render(rows, os.path.join(OUT_DIR, "heat.svg"))

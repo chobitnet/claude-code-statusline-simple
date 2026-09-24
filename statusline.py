@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 """Claude Code status line.
 
-Draws the model, effort, advisor, context window and rate limits from the
+Draws the model, effort, context window and rate limits from the
 JSON that Claude Code sends on stdin.
 Schema: https://code.claude.com/docs/en/statusline
-
-The advisor model is not part of that JSON (as of 2.1.229), so it is recovered
-from the advisorModel field of the last assistant message in the transcript.
 
 The look owes a lot to ccstatusline: a continuous truecolor gradient and bars
 drawn at sub-cell precision. The Powerline separator needs a Nerd Font, so it
@@ -64,7 +61,6 @@ HEAT_STOPS = ((0, (126, 196, 140)), (55, (223, 190, 100)),
               (80, (228, 148, 78)), (100, (222, 88, 88)))
 
 ACCENT_MODEL = (128, 190, 235)
-ACCENT_ADVISOR = (120, 200, 190)
 ACCENT_FLAG = (238, 200, 110)
 NEUTRAL = (150, 158, 172)
 PL_INK = (26, 28, 34)  # ink laid over the coloured backgrounds in powerline
@@ -138,42 +134,6 @@ def short_model(name, model_id):
     return name.strip()
 
 
-def advisor_of(transcript_path):
-    """The advisorModel of the last assistant message, or None."""
-    if not transcript_path or not os.path.exists(transcript_path):
-        return None
-    try:
-        size = os.path.getsize(transcript_path)
-        with open(transcript_path, "rb") as f:
-            f.seek(max(0, size - 512 * 1024))
-            chunk = f.read()
-        lines = chunk.split(b"\n")
-        if size > 512 * 1024 and lines:
-            lines.pop(0)  # the first line was cut mid-way, drop it
-        for line in reversed(lines):
-            if b'"type":"assistant"' not in line:
-                continue
-            m = re.search(rb'"advisorModel"\s*:\s*"([^"]+)"', line)
-            return m.group(1).decode() if m else None
-    except OSError:
-        return None
-    return None
-
-
-def pretty_advisor(model_id):
-    """Turns "claude-opus-4-8" into "Opus 4.8"."""
-    low = model_id.lower()
-    for key, label in (("fable", "Fable"), ("opus", "Opus"),
-                       ("sonnet", "Sonnet"), ("haiku", "Haiku")):
-        if key in low:
-            ver = re.search(rf"{key}-(\d+)(?:-(\d+))?", low)
-            if not ver:
-                return label
-            return f"{label} {ver.group(1)}.{ver.group(2)}" if ver.group(2) \
-                else f"{label} {ver.group(1)}"
-    return model_id
-
-
 def limit_label(key):
     return {
         "five_hour": "5h",
@@ -237,10 +197,6 @@ def build(d):
     effort = (d.get("effort") or {}).get("level")
     head.append(seg("effort", effort) if effort
                 else seg(value="effort —", muted=True))
-
-    adv = advisor_of(d.get("transcript_path"))
-    head.append(seg("adv", pretty_advisor(adv), accent=ACCENT_ADVISOR) if adv
-                else seg(value="adv —", muted=True))
 
     if d.get("fast_mode"):
         head.append(seg(value="⚡fast", accent=ACCENT_FLAG))

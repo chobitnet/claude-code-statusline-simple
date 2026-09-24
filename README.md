@@ -7,7 +7,7 @@ No dependencies, no config file, no Nerd Font. One Python script, ~300 lines.
 
 ![status line](docs/statusline.svg)
 
-It shows the model, the reasoning effort, the advisor model, how full the
+It shows the model, the reasoning effort, how full the
 context window is, and how much of each rate-limit window is used.
 
 ## The gauges change colour as they fill
@@ -32,9 +32,6 @@ Two details it does get fussy about:
 
 - **Sub-cell bars.** The bar is drawn at 1/8-cell precision, so 8% still shows
   a visible `▍` instead of collapsing to an empty bar.
-- **Advisor model.** As of Claude Code 2.1.229 the advisor model is not in the
-  status line JSON, so it is recovered by tailing the last assistant message in
-  the transcript.
 
 ## Install
 
@@ -138,7 +135,7 @@ MIT. See [LICENSE](LICENSE).
 
 ![ステータスライン](docs/statusline.svg)
 
-表示するのは、モデル / effort / advisor モデル / コンテキストの使用量 /
+表示するのは、モデル / effort / コンテキストの使用量 /
 レート制限の各枠の使用量です。
 
 ### ゲージは埋まるにつれて色が変わります
@@ -160,8 +157,6 @@ TOML なし。1ファイルをコピーして `settings.json` に4行足せば�
 そのうえで、2点だけこだわっています。
 
 - **サブセル精度のバー**。バーを1/8セル刻みで描くので、8% でも空バーに潰れずに `▍` が残ります。
-- **advisor モデル**。Claude Code 2.1.229 時点で advisor はステータスラインの JSON に含まれないため、
-  トランスクリプトの最終 assistant メッセージを末尾から読んで復元しています。
 
 ### 導入
 
